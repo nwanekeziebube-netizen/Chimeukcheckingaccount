@@ -280,6 +280,80 @@
             gap: 8px;
         }
 
+        /* Incoming Call Screen */
+        .call-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%);
+            z-index: 12000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        .caller-info {
+            margin-bottom: 80px;
+        }
+        .caller-logo {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .caller-number {
+            font-size: 22px;
+            opacity: 0.9;
+        }
+        .incoming-text {
+            font-size: 18px;
+            margin-bottom: 40px;
+            opacity: 0.85;
+        }
+        .slide-to-answer {
+            width: 280px;
+            height: 60px;
+            background: rgba(255,255,255,0.15);
+            border: 3px solid #22c55e;
+            border-radius: 9999px;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+        }
+        .slide-knob {
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            transition: left 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .ongoing-call {
+            position: fixed;
+            inset: 0;
+            background: #0f172a;
+            z-index: 13000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .ongoing-timer {
+            font-size: 42px;
+            font-weight: 600;
+            margin-bottom: 40px;
+        }
+
         /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
@@ -307,18 +381,20 @@
 
         .toast {
             position: fixed;
-            bottom: 80px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
             background: #10b981;
             color: white;
-            padding: 14px 24px;
+            padding: 16px 24px;
             border-radius: 9999px;
             box-shadow: 0 10px 20px rgba(16,185,129,0.3);
-            z-index: 11000;
+            z-index: 14000;
             display: none;
             align-items: center;
             gap: 10px;
+            max-width: 340px;
+            text-align: center;
         }
     </style>
 </head>
@@ -367,7 +443,6 @@
                     Your daily deposit limit is $100,000.00
                 </div>
 
-                <!-- FIXED Dropbox direct image links (raw=1) -->
                 <div class="check-images">
                     <div class="check-img">
                         <img src="https://www.dropbox.com/scl/fi/ececf5wypzw4vlxsauveg/Photo-Apr-02-2026-6-41-05-PM.jpg?rlkey=2f3uxihre8dfvmisp8swjopnn&st=zm1004br&raw=1" alt="Check Front">
@@ -566,6 +641,31 @@
         </div>
     </div>
 
+    <!-- INCOMING CALL SCREEN -->
+    <div id="incoming-call" class="call-screen">
+        <div class="caller-info">
+            <div class="caller-logo">Lloyds Bank</div>
+            <div class="caller-number">+44 20 7946 0958</div>
+        </div>
+        <div class="incoming-text">Incoming call from Lloyds Bank</div>
+        
+        <div class="slide-to-answer" id="slide-container">
+            <div class="slide-knob" id="slide-knob">
+                <i class="fa-solid fa-phone"></i>
+            </div>
+        </div>
+        <div style="margin-top:60px;font-size:14px;opacity:0.7;">Slide to answer</div>
+    </div>
+
+    <!-- ONGOING CALL SCREEN -->
+    <div id="ongoing-call" class="ongoing-call">
+        <div style="font-size:18px;margin-bottom:20px;">Lloyds Bank</div>
+        <div id="call-timer" class="ongoing-timer">00:00</div>
+        <div style="margin-top:100px;">
+            <button onclick="endCall()" style="background:#ef4444;color:white;border:none;padding:14px 40px;border-radius:9999px;font-size:18px;">End Call</button>
+        </div>
+    </div>
+
     <!-- BOTTOM NAVIGATION -->
     <div class="bottom-nav">
         <div onclick="navigateBottom(0)" class="nav-item active"><i class="fa-solid fa-house"></i>Accounts</div>
@@ -583,6 +683,7 @@
 
     <script>
         let currentAccountIndex = 0;
+        let selectSavingsBalance = 10000.00;
         const accounts = [
             { name: "ChimeUK Bonus Checking", balance: "807.88", color: "#10b981" },
             { name: "ChimeUK Steady Save", balance: "1.10", color: "#eab308" },
@@ -593,7 +694,7 @@
             const toast = document.getElementById('toast');
             document.getElementById('toast-text').innerHTML = message;
             toast.style.display = 'flex';
-            setTimeout(() => { toast.style.display = 'none'; }, 2800);
+            setTimeout(() => { toast.style.display = 'none'; }, 4500);
         }
 
         function startDepositProcess() {
@@ -673,10 +774,130 @@
 
         function completeTransfer() {
             document.getElementById('screen-review-transfer').classList.remove('active');
-            showToast("✅ Transfer submitted instantly • Fee $80 charged");
+            
+            // Start slow spinner sequence
+            const loader = document.getElementById('loading-screen');
+            loader.style.display = 'flex';
+            const stepEl = document.getElementById('loading-step');
+            const fillEl = document.getElementById('progress-fill');
+            const steps = [
+                "Checking for $80 fees",
+                "Fees paid successfully",
+                "Securing bank transfer",
+                "Initializing payment",
+                "Payment is being sent please wait"
+            ];
+            let i = 0;
+            fillEl.style.width = '0%';
+
+            const interval = setInterval(() => {
+                i++;
+                stepEl.textContent = steps[i] || steps[steps.length-1];
+                fillEl.style.width = Math.min(100, i * 20) + '%';
+                if (i >= 5) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        showIncomingCall();
+                    }, 800);
+                }
+            }, 1100);
+        }
+
+        function showIncomingCall() {
+            document.getElementById('incoming-call').style.display = 'flex';
+            
+            // Make slide-to-answer draggable
+            const container = document.getElementById('slide-container');
+            const knob = document.getElementById('slide-knob');
+            let isDragging = false;
+            let startX = 0;
+
+            knob.addEventListener('mousedown', e => {
+                isDragging = true;
+                startX = e.clientX;
+            });
+
+            document.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                let move = e.clientX - startX;
+                if (move < 0) move = 0;
+                if (move > 200) move = 200;
+                knob.style.left = move + 'px';
+            });
+
+            document.addEventListener('mouseup', e => {
+                if (!isDragging) return;
+                isDragging = false;
+                if (parseFloat(knob.style.left) > 160) {
+                    // Answered
+                    document.getElementById('incoming-call').style.display = 'none';
+                    startOngoingCall();
+                } else {
+                    knob.style.left = '6px';
+                }
+            });
+
+            // Touch support
+            knob.addEventListener('touchstart', e => {
+                isDragging = true;
+                startX = e.touches[0].clientX;
+            });
+            document.addEventListener('touchmove', e => {
+                if (!isDragging) return;
+                let move = e.touches[0].clientX - startX;
+                if (move < 0) move = 0;
+                if (move > 200) move = 200;
+                knob.style.left = move + 'px';
+            });
+            document.addEventListener('touchend', () => {
+                if (!isDragging) return;
+                isDragging = false;
+                if (parseFloat(knob.style.left) > 160) {
+                    document.getElementById('incoming-call').style.display = 'none';
+                    startOngoingCall();
+                } else {
+                    knob.style.left = '6px';
+                }
+            });
+        }
+
+        let callTimerInterval;
+        function startOngoingCall() {
+            const ongoing = document.getElementById('ongoing-call');
+            ongoing.style.display = 'flex';
+            let seconds = 0;
+            const timerEl = document.getElementById('call-timer');
+
+            callTimerInterval = setInterval(() => {
+                seconds++;
+                const min = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const sec = (seconds % 60).toString().padStart(2, '0');
+                timerEl.textContent = `${min}:${sec}`;
+            }, 1000);
+
+            // Auto end after 30 seconds
             setTimeout(() => {
+                endCall();
+            }, 30000);
+        }
+
+        function endCall() {
+            clearInterval(callTimerInterval);
+            document.getElementById('ongoing-call').style.display = 'none';
+            
+            // Show Lloyds Bank toast
+            showToast(`<strong>Lloyds Bank</strong><br>Dear valued customer, your check has been put on waiting hold but your funds has been transferred to us and we will release it when you verify your online check.`);
+
+            // Update Select Savings balance to negative
+            selectSavingsBalance = -10000.00;
+            accounts[2].balance = "-10,000.00";
+            
+            // Return to accounts screen and refresh
+            setTimeout(() => {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('screen-accounts').classList.add('active');
-            }, 1600);
+            }, 2800);
         }
 
         function navigateBottom(index) {
@@ -696,7 +917,7 @@
 
         // Initialize
         window.onload = () => {
-            console.log('%c✅ CHIMEUK Mobile Banking – Dropbox check images fixed & loaded', 'color:#10b981;font-weight:700');
+            console.log('%c✅ CHIMEUK Mobile Banking – Final version with incoming Lloyds Bank call simulation', 'color:#10b981;font-weight:700');
         };
     </script>
 </body>
