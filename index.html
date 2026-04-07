@@ -41,7 +41,7 @@
         .screen { display: none; flex-direction: column; min-height: calc(100vh - 140px); }
         .screen.active { display: flex; }
 
-        /* Basic styles for all screens */
+        /* Mobile Deposit */
         .deposit-header { padding: 20px; text-align: center; }
         .deposit-header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
         .tab-bar { display: flex; background: #f8fafc; margin: 0 20px; border-radius: 9999px; padding: 4px; }
@@ -56,6 +56,7 @@
         .check-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
         .submit-btn { background: #0f766e; color: white; border: none; border-radius: 9999px; padding: 18px; font-size: 18px; font-weight: 600; width: 92%; margin: 20px auto; display: block; }
 
+        /* Loading */
         .loading-screen { position: fixed; inset: 0; background: rgba(15,23,42,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; color: white; }
         .spinner { width: 64px; height: 64px; border: 6px solid rgba(255,255,255,0.2); border-top: 6px solid #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -63,6 +64,7 @@
         .progress-bar { width: 260px; height: 6px; background: #334155; border-radius: 9999px; overflow: hidden; }
         .progress-fill { height: 100%; background: #10b981; width: 0%; transition: width 0.4s ease; }
 
+        /* Account Selection & Accounts */
         .account-list { padding: 20px; }
         .account-item { display: flex; align-items: center; padding: 16px 20px; background: white; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         .dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 14px; }
@@ -71,11 +73,13 @@
         .account-card { background: white; border-radius: 20px; padding: 20px; margin: 16px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); cursor: pointer; }
         .credit-score { background: #f8fafc; border-radius: 16px; padding: 20px; margin: 0 20px 20px; }
 
+        /* Detail View */
         .detail-header { background: var(--green); color: white; padding: 30px 20px 40px; text-align: center; }
         .detail-balance { font-size: 52px; font-weight: 700; letter-spacing: -2px; }
         .action-btns { display: flex; gap: 16px; padding: 0 20px; margin-top: -30px; }
         .action-btn { flex: 1; background: white; color: #0f172a; border-radius: 9999px; padding: 16px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; gap: 8px; }
 
+        /* Transfer Form & Review */
         .form-input { background: #f8fafc; border: none; border-radius: 12px; padding: 16px 20px; width: 100%; margin-bottom: 16px; font-size: 16px; }
         .review-box { background: white; margin: 20px; border-radius: 20px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
         .fee-note { background: #fefce8; color: #854d0e; padding: 12px 20px; border-radius: 12px; margin: 16px 20px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
@@ -89,6 +93,26 @@
         .receipt-row:last-child { border-bottom: none; }
         .receipt-highlight { background: #10b981; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; }
         .confirm-btn { background: #10b981; color: white; border: none; border-radius: 9999px; padding: 18px; font-size: 18px; font-weight: 600; width: 100%; margin-top: 30px; }
+
+        /* SUCCESS SCREEN - rises from button */
+        .success-screen {
+            padding: 20px;
+            animation: riseUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes riseUp {
+            from { transform: translateY(120px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .success-card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        .success-check { font-size: 64px; color: #10b981; margin-bottom: 12px; }
+        .success-title { font-size: 24px; font-weight: 700; color: #10b981; margin-bottom: 8px; }
+        .ref { font-size: 13px; color: #64748b; margin-top: 16px; }
 
         /* Modal */
         .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.9); z-index: 15000; display: none; align-items: center; justify-content: center; }
@@ -132,9 +156,10 @@
             gap: 10px;
             max-width: 340px;
             text-align: center;
+            font-size: 14px;
         }
 
-        /* Notification Card under -$10,000 balance */
+        /* Notification Card */
         .notification-card {
             background: #f8fafc;
             border-radius: 16px;
@@ -247,20 +272,17 @@
             </div>
         </div>
 
-        <!-- Detail View with Notification -->
+        <!-- Detail View -->
         <div id="screen-detail" class="screen flex-column">
             <div id="detail-header" class="detail-header">
                 <div id="detail-account-name" style="font-size:18px;opacity:0.9;"></div>
                 <div id="detail-balance" class="detail-balance">$0.00</div>
                 <div style="font-size:15px;opacity:0.9;">Available balance</div>
             </div>
-
             <div class="action-btns">
                 <button onclick="showTransferForm()" class="action-btn"><i class="fa-solid fa-paper-plane"></i> Send</button>
                 <button onclick="fakeReceive()" class="action-btn"><i class="fa-solid fa-download"></i> Receive</button>
             </div>
-
-            <!-- NEW NOTIFICATION CARD under -$10,000 balance -->
             <div id="notification-section" style="display:none;">
                 <div onclick="showReceiptForNotification()" class="notification-card">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -270,14 +292,48 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div style="padding:30px 20px 20px;">
-                <h3 style="margin-bottom:16px;font-weight:600;">Recent activity</h3>
-                <div style="text-align:center;color:#64748b;padding:40px 20px;">No recent transactions yet</div>
+        <!-- Transfer Form -->
+        <div id="screen-transfer-form" class="screen flex-column" style="padding:20px;">
+            <h1 style="font-size:26px;font-weight:600;margin-bottom:20px;">Send money</h1>
+            <input id="transfer-amount" type="text" class="form-input" value="$50.00">
+            <div style="margin-top:20px;">
+                <div class="label">From account</div>
+                <select id="from-account" class="form-input">
+                    <option>ChimeUK Bonus Checking • $807.88</option>
+                    <option>ChimeUK Steady Save • $1.10</option>
+                    <option>ChimeUK Select Savings • -$10,000.00</option>
+                </select>
+            </div>
+            <div style="margin-top:12px;"><div class="label">Account number</div><input id="acc-number" type="text" class="form-input" placeholder="12345678"></div>
+            <div style="margin-top:12px;"><div class="label">Sort code</div><input id="sort-code" type="text" class="form-input" placeholder="12-34-56"></div>
+            <div style="margin-top:12px;"><div class="label">Recipient name</div><input id="recipient-name" type="text" class="form-input" value="Jasvir Singh"></div>
+            <div style="margin-top:12px;"><div class="label">Bank name</div><input id="bank-name" type="text" class="form-input" value="CHIMEUK"></div>
+            <button onclick="submitTransfer()" style="margin-top:40px;background:#10b981;color:white;border:none;border-radius:9999px;padding:18px;font-size:18px;font-weight:600;width:100%;">Send Now</button>
+        </div>
+
+        <!-- Review Transfer -->
+        <div id="screen-review-transfer" class="screen flex-column">
+            <div style="padding:20px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                    <div style="background:#10b981;color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;">✓</div>
+                    <h2 style="font-size:24px;font-weight:600;">Review Transfer</h2>
+                </div>
+                <div class="review-box">
+                    <div style="font-size:14px;color:#64748b;">Amount</div>
+                    <div id="review-amount" style="font-size:52px;font-weight:700;margin:8px 0;">$50.00</div>
+                    <div style="border-top:1px solid #e2e8f0;padding-top:16px;margin-top:16px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:12px;"><span style="color:#64748b;">From</span><strong id="review-from">ChimeUK Bonus Checking</strong></div>
+                        <div style="display:flex;justify-content:space-between;"><span style="color:#64748b;">To</span><strong id="review-to">Jasvir Singh • CHIMEUK</strong></div>
+                    </div>
+                </div>
+                <div class="fee-note"><i class="fa-solid fa-bolt"></i><span><strong>Instant send fee: $80</strong></span></div>
+                <button onclick="submitTransferToReceipt()" style="margin-top:30px;background:#10b981;color:white;border:none;border-radius:9999px;padding:18px;font-size:18px;font-weight:600;width:100%;">Submit Transfer</button>
             </div>
         </div>
 
-        <!-- Receipt Screen (Money Transferring) -->
+        <!-- Receipt Screen -->
         <div id="screen-receipt" class="screen flex-column receipt-screen">
             <div class="receipt-header">
                 <div class="receipt-spinner"></div>
@@ -292,7 +348,23 @@
                 <div class="receipt-row"><span style="color:#64748b;">Payment made by</span><span class="receipt-highlight">Susan Sondico (Lloyd’s)</span></div>
                 <div class="receipt-row" style="border-bottom:none;"><span style="color:#64748b;">Status</span><strong style="color:#10b981;">Processing</strong></div>
             </div>
-            <button onclick="showConfirmationModal()" class="confirm-btn">Confirm Transfer</button>
+            <button onclick="confirmTransfer()" class="confirm-btn">Confirm Transfer</button>
+        </div>
+
+        <!-- SUCCESS SCREEN -->
+        <div id="screen-success" class="screen flex-column success-screen">
+            <div class="success-card">
+                <div class="success-check">✅</div>
+                <div class="success-title">Transfer Successful</div>
+                <div class="receipt-card">
+                    <div class="receipt-row"><span style="color:#64748b;">Amount</span><strong id="success-amount" style="font-size:26px;"></strong></div>
+                    <div class="receipt-row"><span style="color:#64748b;">From</span><strong id="success-from"></strong></div>
+                    <div class="receipt-row"><span style="color:#64748b;">To</span><strong id="success-to"></strong></div>
+                    <div class="receipt-row"><span style="color:#64748b;">Transfer fee</span><strong style="color:#10b981;">$150.00</strong></div>
+                    <div class="receipt-row"><span style="color:#64748b;">Reference</span><strong id="success-ref" style="font-size:15px;color:#10b981;"></strong></div>
+                </div>
+                <button onclick="navigateBottom(0)" style="margin-top:30px;background:#10b981;color:white;border:none;border-radius:9999px;padding:18px;font-size:18px;font-weight:600;width:100%;">Done</button>
+            </div>
         </div>
 
     </div>
@@ -339,7 +411,7 @@
             const toast = document.getElementById('toast');
             document.getElementById('toast-text').innerHTML = message;
             toast.style.display = 'flex';
-            setTimeout(() => toast.style.display = 'none', 4500);
+            setTimeout(() => toast.style.display = 'none', 5000);
         }
 
         function startDepositProcess() {
@@ -377,12 +449,9 @@
             document.getElementById('screen-accounts').classList.remove('active');
             const detail = document.getElementById('screen-detail');
             detail.classList.add('active');
-
             document.getElementById('detail-account-name').innerHTML = acc.name + ' <span style="font-size:15px;opacity:0.8;">• Available balance</span>';
             document.getElementById('detail-balance').textContent = '$' + acc.balance;
             document.getElementById('detail-header').style.background = acc.color;
-
-            // Show notification only for the -$10,000 balance
             document.getElementById('notification-section').style.display = (i === 2) ? 'block' : 'none';
         }
 
@@ -412,13 +481,31 @@
             document.getElementById('receipt-to').textContent = document.getElementById('recipient-name').value + " • " + document.getElementById('bank-name').value;
         }
 
+        function confirmTransfer() {
+            const receipt = document.getElementById('screen-receipt');
+            receipt.style.opacity = '0.3';
+            setTimeout(() => {
+                receipt.classList.remove('active');
+                receipt.style.opacity = '1';
+                const success = document.getElementById('screen-success');
+                success.classList.add('active');
+                document.getElementById('success-amount').textContent = document.getElementById('receipt-amount').textContent;
+                document.getElementById('success-from').textContent = document.getElementById('receipt-from').textContent;
+                document.getElementById('success-to').textContent = document.getElementById('receipt-to').textContent;
+                document.getElementById('success-ref').textContent = "REF-" + Math.floor(100000000 + Math.random() * 900000000);
+                setTimeout(() => {
+                    showToast("Dear Jasvir Singh your transfer has been completed successfully please proceed to check your SMS for a message from us to reconfirm your transfer and receive your money instantly");
+                }, 800);
+            }, 1600);
+        }
+
         function showConfirmationModal() {
             document.getElementById('confirmation-modal').style.display = 'flex';
         }
 
         function confirmYes() {
             document.getElementById('confirmation-modal').style.display = 'none';
-            showToast("❌ Error: Fee has not been paid. Please pay the $150 fee first.");
+            confirmTransfer();
         }
 
         function confirmNo() {
@@ -438,7 +525,7 @@
         }
 
         window.onload = () => {
-            console.log('%c✅ CHIMEUK Mobile Banking – Fully fixed and loaded with notification under -$10,000 balance', 'color:#10b981;font-weight:700');
+            console.log('%c✅ CHIMEUK Mobile Banking – Full working version with rising success page + iPhone toast', 'color:#10b981;font-weight:700');
         };
     </script>
 </body>
