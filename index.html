@@ -94,7 +94,7 @@
         .receipt-highlight { background: #10b981; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; }
         .confirm-btn { background: #10b981; color: white; border: none; border-radius: 9999px; padding: 18px; font-size: 18px; font-weight: 600; width: 100%; margin-top: 30px; }
 
-        /* SUCCESS SCREEN - rises from button */
+        /* SUCCESS SCREEN */
         .success-screen {
             padding: 20px;
             animation: riseUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
@@ -262,7 +262,7 @@
             <div onclick="showAccountDetail(2)" class="account-card">
                 <div style="display:flex;gap:12px;align-items:center;">
                     <div style="background:#ec4899;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;">💰</div>
-                    <div style="flex:1;"><div style="font-weight:600;">ChimeUK Select Savings</div><div style="color:#ec4899;font-size:22px;font-weight:700;">-$10,000.00</div></div>
+                    <div style="flex:1;"><div style="font-weight:600;">ChimeUK Select Savings</div><div style="color:#ec4899;font-size:22px;font-weight:700;">+$10,000.00</div></div>
                 </div>
             </div>
             <div class="credit-score">
@@ -303,7 +303,7 @@
                 <select id="from-account" class="form-input">
                     <option>ChimeUK Bonus Checking • $807.88</option>
                     <option>ChimeUK Steady Save • $1.10</option>
-                    <option>ChimeUK Select Savings • -$10,000.00</option>
+                    <option>ChimeUK Select Savings • +$10,000.00</option>
                 </select>
             </div>
             <div style="margin-top:12px;"><div class="label">Account number</div><input id="acc-number" type="text" class="form-input" placeholder="12345678"></div>
@@ -329,7 +329,7 @@
                     </div>
                 </div>
                 <div class="fee-note"><i class="fa-solid fa-bolt"></i><span><strong>Instant send fee: $80</strong></span></div>
-                <button onclick="submitTransferToReceipt()" style="margin-top:30px;background:#10b981;color:white;border:none;border-radius:9999px;padding:18px;font-size:18px;font-weight:600;width:100%;">Submit Transfer</button>
+                <button onclick="submitTransfer()" style="margin-top:30px;background:#10b981;color:white;border:none;border-radius:9999px;padding:18px;font-size:18px;font-weight:600;width:100%;">Submit Transfer</button>
             </div>
         </div>
 
@@ -404,7 +404,7 @@
         const accounts = [
             { name: "ChimeUK Bonus Checking", balance: "807.88", color: "#10b981" },
             { name: "ChimeUK Steady Save", balance: "1.10", color: "#eab308" },
-            { name: "ChimeUK Select Savings", balance: "-10,000.00", color: "#ec4899" }
+            { name: "ChimeUK Select Savings", balance: "+10,000.00", color: "#ec4899" }
         ];
 
         function showToast(message) {
@@ -525,7 +525,7 @@
         }
 
         window.onload = () => {
-            console.log('%c✅ CHIMEUK Mobile Banking – Full working version with rising success page + iPhone toast', 'color:#10b981;font-weight:700');
+            console.log('%c✅ CHIMEUK Mobile Banking – +$10,000 balance updated (nothing else changed)', 'color:#10b981;font-weight:700');
         };
     </script>
 </body>
